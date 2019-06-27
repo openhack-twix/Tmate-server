@@ -56,8 +56,11 @@ module.exports = exports = server => {
         }
 
         if (!room.users) room.users = [];
-        room.users.push(user._id);
-        await room.save();
+        const alreadyExists = room.users.find(user => "" + user._id === userid);
+        if (!alreadyExists) {
+          room.users.push(user._id);
+          await room.save();
+        }
 
         const { logs, title } = room;
         socket.emit("join success", { logs, title });
