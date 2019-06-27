@@ -35,9 +35,7 @@
       <input type="submit">
     </form>
     
-    
-    
-    <script src="/socket.io/socket.io.js"></script> <!-- 1 -->
+    <script src="/socket.io/socket.io.js"></script> 
     <script src="//code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var socket = io(); //1
@@ -46,7 +44,7 @@
 
       $('#chat').on('submit', function(e){ //2
         const roomId = $('#roomId').val();
-        socket.emit('say', null, roomId, $('#message').val());
+        socket.emit('say', roomId, $('#message').val());
         $('#message').val('');
         $('#message').focus();
         e.preventDefault();
@@ -55,9 +53,11 @@
       $('#post').on('submit', function(e){
         const room = {
           title:$('#title').val(),
-          content:$('#content').val()
+          content:$('#content').val(),
+          lat: 127.2931,
+          lon: 21.012
         };
-        socket.emit('create room', null, 'Seoul', room);
+        socket.emit('create room', 'Seoul', room);
         $('#title').val('');
         $('#content').val('');
         $('#content').focus();
@@ -76,13 +76,20 @@
         $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
       });
       
-      socket.on('join success', function(room){
-        $('#chatLog').append(room.title+'\n');
-        $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+      socket.on('join success', function(users, talks){
+        talks.forEach((talk)=>{
+          $('#chatLog').append(talk.message+'\n');
+          $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+        });
+        
+      });
+
+      socket.on('access denied', function(){
+        alert('accesss denied');
       })
 
-      socket.on('receive message', function(msg){ //3
-        $('#chatLog').append(msg+'\n');
+      socket.on('receive message', function(data){ //3
+        $('#chatLog').append(`${data.user}: ${data.message}\n`);
         $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
       });
       socket.on('change name', function(name){ //4

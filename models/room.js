@@ -11,10 +11,16 @@ const roomSchema = new mongoose.Schema({
   content: {
     type: String
   },
-  author: {
+  city: {
     type: String
   },
-  expirationTime: {
+  lat:{
+    type: Number
+  },
+  lon:{
+    type:Number
+  },
+  due: {
     type: Date
   },
   logs: {

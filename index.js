@@ -1,18 +1,22 @@
 const express = require("express");
 const app = express();
 const initRoom = require("./rooms");
-const http = require("http").Server(app); //1
+const http = require("http");
+const server = http.createServer(app);
 const mongoose = require('mongoose');
 var helmet = require('helmet')
-var session = require('express-session')
 app.use(helmet());
 
-app.use(express.static("./public"));
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
+// in latest body-parser use like below.
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(express.static("./"));
 app.use(express.json());
 
-initRoom(http);
+initRoom(server);
 
-require('./middlewares/auth')(app);
 require('./middlewares/routes')(app);
 
 if(!process.env.jwtKey){
@@ -21,7 +25,7 @@ if(!process.env.jwtKey){
 }
 
 // database 연결
-const dbUrl = "mongodb://localhost/tmate";
+const dbUrl = "mongodb://localhost/tmatet";
 
 mongoose
   .connect(dbUrl, {
@@ -34,6 +38,6 @@ mongoose
 
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`start listening on port ${port}`);
 });

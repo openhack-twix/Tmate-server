@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
-const auth = require("../middlewares/auth");
+const auth = require("../middlewares/auth_bak");
 const { User, validate: validateUser } = require("../models/user");
 const validateId = require("../models/id");
 
