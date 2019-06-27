@@ -3,21 +3,22 @@ const app = express();
 const initRoom = require("./rooms");
 const http = require("http").Server(app); //1
 const mongoose = require('mongoose');
+var helmet = require('helmet')
+var session = require('express-session')
+app.use(helmet());
 
+app.use(express.static("./public"));
 app.use(express.json());
 
 initRoom(http);
 
+require('./middlewares/auth')(app);
 require('./middlewares/routes')(app);
 
 if(!process.env.jwtKey){
   console.error('jwtKey is not defined');
   process.exit(1);
 }
-
-app.get("/", function(req, res) {
-  res.sendFile(__dirname + "/client.html");
-});
 
 // database 연결
 const dbUrl = "mongodb://localhost/tmate";
