@@ -1,43 +1,86 @@
-const socketio = require("socket.io"); //1
+const socketio = require("socket.io");
+const getFakeUser = require("./debugHelper");
+const { Room } = require("../models/room");
 
-const area = {
-  name: "california",
-  members: [],
-  article: null
-};
+const Areas = require("../areas");
+
+function getUserFromToken(token) {
+  try {
+    return jwt.verify(token, process.env.jwtKey);
+  } catch (error) {
+    return null;
+  }
+}
 
 module.exports = exports = http => {
   const io = socketio(http);
   io.on("connection", function(socket) {
+    socket.on("init", (authToken, areaName) => {
+      /********** DEBUG ************/
+      // const user = getUserFromToken(authToken);
+      const user = getFakeUser(socket.id);
 
-    // 본인이 속한 room에 join
-    // 지역이 california라고 가정
-    socket.join(area.name, err => {
-      if (err) return console.error(`Failed to enter the room:${area.name}`);
-
-      area.members.push(socket);
-      console.log(`Joined the room: ${area.name}`);
-      socket.emit("joined", `${area.name}에 입장`);
-
-      if(area.article){
-        socket.emit('notice', area.article);
-      }
-    });
-    console.log(`user connected to ${area.name}: `, socket.id); //3-1
-
-    socket.on("leave", () => {
-      // TODO: 지역에서 탈출
+      const area = Areas.addUser(areaName, socket.id, user);
+      if (!area) socket.emit("init failed");
     });
 
-    // 연결을 종료했을 때
+    socket.on("create room", async (authToken, areaName, room) => {
+      const { title, content } = room;
+      /********** DEBUG ************/
+      // const user = getUserFromToken(authToken);
+      const user = getFakeUser(socket.id);
+
+      const expirationTime = new Date();
+      expirationTime.setHours(expirationTime.getHours() + 3);
+      room = await new Room({
+        title,
+        content,
+        author: user,
+        expirationTime
+      }).save();
+
+      socket.join(room._id, err => {
+        if (err) return console.error(`Failed to enter the room:${room._id}`);
+        socket.emit("create success", room);
+      });
+
+    });
+
+    socket.on("join", async (authToken, roomId) => {
+      const room = await Room.findOne({_id: roomId});
+      if(!room || !io.sockets.adapter.rooms) socket.emit('join failed', 'no room with given id');
+      socket.join(roomId, err => {
+        if (err) socket.emit("join failed");
+
+        /********** DEBUG ************/
+        // const user = getUserFromToken(authToken);
+        const user = getFakeUser(socket.id);
+        
+        socket.emit("join success", room);
+      });
+    });
+
+    socket.on("leave", (authToken, areaName) => {
+      /********** DEBUG ************/
+      // const user = getUserFromToken(authToken);
+      const user = getFakeUser(socket.id);
+      socket.emit("leave success");
+    });
+
     socket.on("disconnect", function() {
-      // TODO: 연결 종료
       console.log("user disconnected: ", socket.id);
     });
 
-    // 새로운 글을 등록했을 때
-    socket.on("post message", function(name, text) {
-      // TODO: 해당 지역에 새 글 등록
+    socket.on("say", async (authToken, roomId, message) => {
+      /********** DEBUG ************/
+      // const user = getUserFromToken(authToken);
+      const user = getFakeUser(socket.id);
+
+      const room = await Room.findById(roomId);
+      room.logs.push({ user: user.name, message});
+      await room.save();
+
+      socket.to(roomId).emit('receive message', message);
     });
   });
 };
