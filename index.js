@@ -9,7 +9,6 @@ app.use(helmet());
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
-// in latest body-parser use like below.
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static("./"));

@@ -6,19 +6,24 @@ Joi.objectId = require("joi-objectid")(Joi);
 
 const roomSchema = new mongoose.Schema({
   title: {
-    type: String
+    type: String,
+    required: true
   },
   content: {
-    type: String
+    type: String,
+    default: ''
   },
   city: {
-    type: String
+    type: String,
+    required: true
   },
   lat:{
-    type: Number
+    type: Number,
+    required: true
   },
   lon:{
-    type:Number
+    type:Number,
+    required: true
   },
   due: {
     type: Date

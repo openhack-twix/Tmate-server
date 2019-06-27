@@ -20,7 +20,7 @@ router.post('/login', async (req,res)=>{
     console.log(user);
   } 
 
-  console.log('login success');
+  console.log(`login success: ${user.nickname}`);
   return res.status(200).send({
     success: "0",
     colorcode: user.colorcode,
