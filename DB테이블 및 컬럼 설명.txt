@@ -1,0 +1,26 @@
+===================
+//user
+
+U_SEQ = user 시퀀스
+NAME = 사용자 지정 닉네임
+SNS = 로그인 방법(0 = 페이스북, 1 = 카카오톡)
+EMAIL = 사용자 메일 주소, null 허용
+===================
+//post
+
+P_SEQ = post 시퀀스
+U_SEQ = user 식별번호
+TITLE = post의 보여지는 부분 text
+CONTENT = post 터치 시 보여지는 text
+CITY = post가 붙혀진 도시명
+LAT = 위도값
+LON = 경도값
+DUE = 소멸시간
+===================
+//chat
+
+C_SEQ = chat 시퀀스
+U_SEQ = user 식별번호
+P_SEQ = post 식별번호
+MSG = 유저가 입력한 메세지
+TIME = 메세지를 보낸 시간
