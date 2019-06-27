@@ -1,0 +1,61 @@
+//회원가입 & 로그인
+
+클라이언트에서 페이스북, 카카오톡 로그인 선택
+
+클라이언트에서 USERNAME, SNS ,EMAIL를 서버로 전송
+
+서버에서 DB로 값을 INSERT
+
+INSERT INTO user (NAME,OAUTHID,SNS,EMAIL,COLOR) VALUES ('사용자 정의 이름', 고유 값, sns값, '이메일', '색값' );
+==============================
+//DB에 POST가 저장되는 과정
+
+클라이언트에서 POST작성
+(-> 서버 전달값 : 유저 정보, 제목, 내용)
+
+서버에서 DB로 유저정보(NAME)로 SELECT해서 U_SEQ를 받아옴
+(혹은 JOIN으로 한번에 INSERT) 
+=>SELECT U_SEQ FROM user where name='이름';
+
+DB에서 받아온 U_SEQ와 클라이언트에서 받아온 TITLE, CONTENT, CITY, LAT, LON, DUE를 
+POST TABLE로 INSERT
+=> insert into post (u_seq, title, content, city, lat, lon, due) value (u_seq정수, '제목', '내용', '도시명', '경도', '위도', NOW()+30000);
+===============================
+delete from user where oauthid = '';
+//유저에게 POST를 띄워주는 과정
+
+로그인한 유저의 실시간 위치정보를 클라이언트에서 서버로 보내줌
+
+서버에서 DB에 현재 장소와 일치하는 POST를 SELECT로 받아옴
+=> SELECT * FROM post where city='지역이름';
+
+받아온 값의 P_SEQ(post시퀀스 = 방번호),TITLE, CONTENTS, LAT, LONG, DUE(소멸시간)을 클라이언트로 전송
+
+클라이언트에서 서버에서 받은 값으로 지정된 위치에 말풍선 UI를 띄우고 TITLE TEXT출력.
+
+유저가 말풍선을 꾹 누를시 TITLE과 CONTENTS를 TEXT로 출력해줌.
+
+===============================
+
+//유저 채팅 입력시
+
+클라이언트에서 서버로 USERNAME, p_seq, MSG, TIME을 서버로 전송
+
+서버에서 USERNAME과 MSG, TIME을 DB로 전송
+=>insert into chat (u_seq,p_seq,msg,time) value ((select u.u_seq from user u where u.name = '이름'), 방번호(정수), '메세지', now());
+===============================
+
+//채팅 리스트
+
+해당 말풍선의 채팅에 입장할 경우 방번호(post시퀀스)와 유저정보를 서버에 전송
+
+서버에서 DB에 SELECT를 통해 방번호(P_SEQ)에 해당하는 컬럼을 모두 불러옴
+=> SELECT * FROM post where p_seq=방번호(정수);
+
+서버에서 클라이언트로 USERNAME과 MSG, TIME을 뿌려줌
+
+
+
+
+
+
