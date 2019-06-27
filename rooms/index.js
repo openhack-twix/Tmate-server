@@ -1,6 +1,6 @@
 const { Room } = require("../models/room");
 const { User } = require("../models/user");
-// const logger = require('../logger');
+const logger = require("../logger");
 
 module.exports = exports = server => {
   const io = require("socket.io")(server);
@@ -23,7 +23,7 @@ module.exports = exports = server => {
         socket.join(room._id, err => {
           if (err) return socket.emit("create fail");
           socket.emit("create success", { roomid: room._id });
-          console.log(`${userid}가 방 생성: ${room}`);
+          logger.info(`${userid}가 방 생성: ${room}`);
           // logger.info(`${userid}가 방 생성: ${room}`);
         });
       }
@@ -32,67 +32,91 @@ module.exports = exports = server => {
     socket.on("join", async ({ roomid, userid }) => {
       // for (let id in socket.rooms) {
       //   if (id === roomid){
-      //     socket.emit("join failed", "already joined room");
-      //     return console.log("join failed: already joined room")
+      //     socket.emit("join failed", "already joined room" );
+      //     return logger.info("join failed: already joined room")
       //   }
       // }
 
       const room = await Room.findById(roomid);
       if (!room) {
         socket.emit("join failed", "no room with given id");
-        return console.log(`joined failed: no room with given id: ${roomid}`);
+        return logger.info(`joined failed: no room with given id: ${roomid}`);
       }
 
       const user = await User.findById(userid);
       if (!user) {
         socket.emit("join failed", "no user with given id");
-        return console.log(`joined failed: no user with given id: ${user.id}`);
+        return logger.info(`joined failed: no user with given id: ${userid}`);
       }
 
-      socket.join(roomid, err => {
+      socket.join(roomid, async err => {
         if (err) {
           socket.emit("join failed");
-          return console.log('joined failed');
+          return logger.info("joined failed");
         }
+
+        if (!room.users) room.users = [];
+        room.users.push(user._id);
+        await room.save();
 
         const { logs, title } = room;
         socket.emit("join success", { logs, title });
-        console.log(`${user.nickname}이 방 ${roomid}에 join 성공.`);
-        // logger.info(`${user.nickname}이 방 ${roomid}에 join 성공.`);
-        socket.to(roomid).emit("receive message", {
+        logger.info(`${user.nickname}이 방 ${roomid}에 join 성공.`);
+
+        socket.to(roomid).emit("receive", {
           user: "[안내]",
           message: `${user.nickname}님이 입장하셨습니다.`
         });
       });
     });
 
-    socket.on("leave", roomid => {
-      socket.leave(roomid);
-      socket.emit("leave success");
-    });
-
-    socket.on("disconnect", function() {
-      console.log("user disconnected: ", socket.id);
-    });
-
-    socket.on("send", async (roomid, message, userid) => {
+    /****************** */
+    socket.on("send message", async ({ roomid, message, userid }) => {
       const user = await User.findById(userid);
       // if(!user) {...}
 
-      console.log(`${user.name}:`, message);
+      logger.info(`${user.nickname}: ${message}`);
       const room = await Room.findById(roomid);
       room.logs.push({
-        user: user.nickname,
+        user: {
+          name: user.nickname,
+          colorcode: user.colorcode
+        },
         message
       });
       await room.save();
-      console.log(`send: ${user.nickname} / ${message}`);
+      logger.info(`send: ${user.nickname} / ${message}`);
 
-      socket.emit("send success");
-      socket.to(roomid).emit("receive message", {
-        user: { name: user.name, colorcode: user.colorcode },
+      io.in(roomid).emit("receive", {
+        user: { name: user.nickname, colorcode: user.colorcode },
         message
       });
+    });
+
+    socket.on("leave", async ({ roomid, userid }) => {
+      const user = await User.findById(userid);
+      if (!user) {
+        socket.emit(`leave failed', 'no user with given id: ${userid}`);
+        return logger.info(`leave failed: no user with given id ${userid}`);
+      }
+
+      const room = await Room.findById(roomid);
+      room.users = room.users.filter(user => {
+        return "" + user._id != userid;
+      });
+      await room.save();
+
+      logger.info(`${user.nickname}이 방 ${roomid}을  퇴장`);
+      socket.emit("leave success");
+      socket.to(roomid).emit("receive", {
+        user: "[안내]",
+        message: `${user.nickname}님이 퇴장하셨습니다.`
+      });
+      socket.leave(roomid);
+    });
+
+    socket.on("disconnect", function(userid) {
+      logger.info(`user disconnected, socketid:${socket.id}`);
     });
   });
 };

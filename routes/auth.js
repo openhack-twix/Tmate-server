@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { User } = require("../models/user");
+const logger = require('../logger');
 
 // const authService = require("../services/auth");
 const generateColor = require("../utils/color");
@@ -16,7 +17,7 @@ const words = [
   "벌"
 ];
 function generateWord() {
-  return "익명의 " + words[Math.floor(Math.random() % 3)];
+  return "익명의 " + words[Math.floor(Math.random() % words.length)];
 }
 
 router.post("/login", async (req, res) => {
@@ -26,10 +27,10 @@ router.post("/login", async (req, res) => {
     const colorcode = generateColor();
     const nickname = generateWord();
     user = await new User({ username, colorcode, nickname }).save();
-    console.log(user);
+    logger.info(user);
   }
 
-  console.log(`login success: ${user.nickname}`);
+  logger.info(`${user.nickname} 로그인`);
   return res.status(200).send({
     success: "0",
     colorcode: user.colorcode,
@@ -41,7 +42,7 @@ router.post("/login", async (req, res) => {
 router.post("/logout", async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.body.id);
-    console.log(`${user.nickname} 로그아웃`);
+    logger.info(`${user.nickname} 로그아웃`);
   } catch (err) {
     res.status(400).send("비정상 요청");
   }

@@ -1,6 +1,6 @@
 const winston = require('winston');
-// require('winston-daily-rotate-file');
-// require('date-utils');
+require('winston-daily-rotate-file');
+require('date-utils');
  
 const logger = winston.createLogger({
     level: 'debug',

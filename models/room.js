@@ -31,7 +31,13 @@ const roomSchema = new mongoose.Schema({
   logs: {
     type: Array,
     default: []
-  }
+  },
+  users: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }
+  ]
 });
 
 // roomSchema.methods.createToken = function() {

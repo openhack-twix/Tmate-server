@@ -1,13 +1,14 @@
+const logger = require('./logger');
 const express = require("express");
 const app = express();
 const initRoom = require("./rooms");
 const http = require("http");
 const server = http.createServer(app);
 const mongoose = require('mongoose');
-var helmet = require('helmet')
+const helmet = require('helmet')
 app.use(helmet());
 
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -18,13 +19,13 @@ initRoom(server);
 
 require('./middlewares/routes')(app);
 
-if(!process.env.jwtKey){
-  console.error('jwtKey is not defined');
-  process.exit(1);
-}
+// if(!process.env.jwtKey){
+//   console.error('jwtKey is not defined');
+//   process.exit(1);
+// }
 
 // database 연결
-const dbUrl = "mongodb://localhost/tmatet";
+const dbUrl = process.env.DB_URL || "mongodb://localhost/tmatet";
 
 mongoose
   .connect(dbUrl, {
@@ -32,11 +33,10 @@ mongoose
     useFindAndModify: false
   })
   
-  .then(() => console.log("🔥 Connected to mongodb!",`[${dbUrl}]`))
-  .catch(err => console.log(`☠️ Failed to connect to mongodb: [${dbUrl}]`, err.message));
-
+  .then(() => logger.info("🔥 Connected to mongodb!",`[${dbUrl}]`))
+  .catch(err => logger.info(`☠️ Failed to connect to mongodb: [${dbUrl}]`, err.message));
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
-  console.log(`start listening on port ${port}`);
+  logger.info(`🌈 start listening on port ${port}`);
 });
