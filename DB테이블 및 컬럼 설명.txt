@@ -2,9 +2,11 @@
 //user
 
 U_SEQ = user 시퀀스
+OAUTHID = 고유식별ID
 NAME = 사용자 지정 닉네임
 SNS = 로그인 방법(0 = 페이스북, 1 = 카카오톡)
 EMAIL = 사용자 메일 주소, null 허용
+COLOR = 사용자 컬러
 ===================
 //post
 
