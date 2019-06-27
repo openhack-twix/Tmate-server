@@ -7,22 +7,24 @@ Joi.objectId = require("joi-objectid")(Joi);
 const roomSchema = new mongoose.Schema({
   title: {
     type: String,
+    minlength: 1,
     required: true
   },
   content: {
     type: String,
-    default: ''
+    default: ""
   },
   city: {
     type: String,
+    minlength: 1,
     required: true
   },
-  lat:{
+  lat: {
     type: Number,
     required: true
   },
-  lon:{
-    type:Number,
+  lon: {
+    type: Number,
     required: true
   },
   due: {
@@ -40,28 +42,6 @@ const roomSchema = new mongoose.Schema({
   ]
 });
 
-// roomSchema.methods.createToken = function() {
-//   return jwt.sign(
-//     _.pick(this, ["_id", "username", "isAdmin"]),
-//     config.get("jwtKey")
-//   );
-// };
-
 const Room = mongoose.model("Room", roomSchema);
-// const schema = {
-//   username: Joi.string()
-//     .email()
-//     .required(),
-//   password: Joi.string()
-//     .min(5)
-//     .max(255),
-//   regDate: Joi.date().default(new Date()),
-//   isAdmin: Joi.bool().default(false),
-//   bike: Joi.objectId().default(null),
-//   rentStart: Joi.date().default(null)
-// };
-// function validate(user) {
-//   return Joi.validate(user, schema);
-// }
 
 module.exports = exports = { Room };

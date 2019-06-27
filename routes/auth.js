@@ -5,27 +5,15 @@ const logger = require('../logger');
 
 // const authService = require("../services/auth");
 const generateColor = require("../utils/color");
+const  generateRandomNickname =require('../utils/nickname');
 
-const words = [
-  "강아지",
-  "망아지",
-  "앵무새",
-  "비둘기",
-  "개미",
-  "지렁이",
-  "칠면조",
-  "벌"
-];
-function generateWord() {
-  return "익명의 " + words[Math.floor(Math.random() % words.length)];
-}
 
 router.post("/login", async (req, res) => {
   const username = req.body.username;
   let user = await User.findOne({ username });
   if (!user) {
     const colorcode = generateColor();
-    const nickname = generateWord();
+    const nickname = generateRandomNickname();
     user = await new User({ username, colorcode, nickname }).save();
     logger.info(user);
   }
