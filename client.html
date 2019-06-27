@@ -1,0 +1,93 @@
+<!-- client.html -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Chat</title>
+    <style>
+      .chat_log{ width: 95%; height: 200px; }
+      .name{ width: 10%; }
+      .message{ width: 70%; }
+      .chat{ width: 10%; }
+    </style>
+  </head>
+  <body>
+    <div>
+      <textarea id="chatLog" class="chat_log" readonly></textarea>
+    </div>
+    <form id="chat">
+      <input id="name" class="name" type="text" readonly>
+      <input id="message" class="message" type="text">
+      <input id="roomId" class="roomId" type="text">
+      <input type="submit" class="chat" value="chat"/>
+    </form>
+    <div id="box" class="box"/>
+
+    <form id="post">
+      <input type="text" id="title">
+      <input type="text" id="content">
+      <input type="submit">
+    </form>
+
+    <form id="join">
+      <input type="text" id="id">
+      <input type="submit">
+    </form>
+    
+    
+    
+    <script src="/socket.io/socket.io.js"></script> <!-- 1 -->
+    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io(); //1
+
+      socket.emit('init', null, 'Seoul');
+
+      $('#chat').on('submit', function(e){ //2
+        const roomId = $('#roomId').val();
+        socket.emit('say', null, roomId, $('#message').val());
+        $('#message').val('');
+        $('#message').focus();
+        e.preventDefault();
+      });
+
+      $('#post').on('submit', function(e){
+        const room = {
+          title:$('#title').val(),
+          content:$('#content').val()
+        };
+        socket.emit('create room', null, 'Seoul', room);
+        $('#title').val('');
+        $('#content').val('');
+        $('#content').focus();
+        e.preventDefault();
+      });
+
+      $('#join').on('submit', function(e){
+        socket.emit('join', null, $('#id').val());
+        $('#id').val('');
+        e.preventDefault();
+      });
+
+      socket.on('new post', function(post){
+        console.log('posted!');
+        $('#chatLog').append(`${post.title}: ${post.content}\n`);
+        $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+      });
+      
+      socket.on('join success', function(room){
+        $('#chatLog').append(room.title+'\n');
+        $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+      })
+
+      socket.on('receive message', function(msg){ //3
+        $('#chatLog').append(msg+'\n');
+        $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
+      });
+      socket.on('change name', function(name){ //4
+        $('#name').val(name);
+      });
+    </script>
+  </body>
+</html>
