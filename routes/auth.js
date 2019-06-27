@@ -1,12 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { User } = require("../models/user");
-const logger = require('../logger');
+const logger = require("../logger");
 
-// const authService = require("../services/auth");
 const generateColor = require("../utils/color");
-const  generateRandomNickname =require('../utils/nickname');
-
+const generateRandomNickname = require("../utils/nickname");
 
 router.post("/login", async (req, res) => {
   const username = req.body.username;

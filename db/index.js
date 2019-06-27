@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const logger = require("../logger");
 
 module.exports = function() {
-  // database 연결
   const dbUrl = process.env.DB_URL || "mongodb://localhost/tmatet";
 
   mongoose.set("useNewUrlParser", true);
