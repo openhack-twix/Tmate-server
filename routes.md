@@ -34,3 +34,35 @@ on: "say"
 param:
   roomid, message, userid
 broadcast: "receive message", {user, message}
+
+on: "leave"
+param: roomid
+emit: "leave success"
+
+on: "send"
+param: roomid, message, userid
+emit: 
+  "receive message", {user, message}
+
+socket.on("leave", roomid => {
+      socket.leave(roomid);
+      socket.emit("leave success");
+    });
+
+    socket.on("disconnect", function() {
+      console.log("user disconnected: ", socket.id);
+    });
+
+    socket.on("say", async (roomid, message, userid) => {
+      const user = await User.findById(userid);
+      // if(!user) {...}
+
+      console.log(`${user.name}:`, message);
+      const room = await Room.findById(roomid);
+      room.logs.push({
+        user: user.username,
+        message
+      });
+
+      socket.to(roomid).emit("receive message", { user: user.name, message });
+    });

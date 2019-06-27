@@ -5,11 +5,10 @@ const {User} = require('../models/user');
 const authService = require('../services/auth');
 const generateColor = require('../utils/color');
 
-const words = ["사자", "호랑이", "앵무새", "비둘기", "개미"];
+const words = ["강아지", "망아지", "앵무새", "비둘기", "개미", "지렁이", "칠면조", "벌"];
 function generateWord(){
   return '익명의 '+words[Math.floor(Math.random()%3)];
 }
-
 
 router.post('/login', async (req,res)=>{
   const username = req.body.username;

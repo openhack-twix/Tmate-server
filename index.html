@@ -81,7 +81,6 @@
           $('#chatLog').append(talk.message+'\n');
           $('#chatLog').scrollTop($('#chatLog')[0].scrollHeight);
         });
-        
       });
 
       socket.on('access denied', function(){

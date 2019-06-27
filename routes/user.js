@@ -7,8 +7,8 @@ const validateId = require("../models/id");
 
 const router = express.Router();
 
-router.get("/me", [auth], async (req, res) => {
-  const id = req.user._id;
+router.get("/me", async (req, res) => {
+  const id = req.params._id;
   const { error } = validateId(id);
   if (error)
     return res.status(404).send("The user with the given id does not exists.");
@@ -26,7 +26,6 @@ router.get("/", [auth], async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  console.log('req.body:',req.body);
   const { username, password } = req.body;
   const user = { username, password, isAdmin: false };
 
