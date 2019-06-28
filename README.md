@@ -1,7 +1,7 @@
 # Tmate (서버)
 > 2019 오픈핵
 > 클라이언트 저장소: https://github.com/openhack-twix/Tmate
-
+<!-- 
 ## 설치 및 실행
 
 프로젝트를 원하는 디렉토리로 가져옵니다.
@@ -18,7 +18,9 @@ $ cd Tmate-server
 $ npm install
 ```
 
+#
+
 ### MongoDB 실행
 ```shell
 $ sudo mongod
-```
+``` -->
