@@ -8,6 +8,7 @@ const generateRandomNickname = require("../utils/nickname");
 
 router.post("/login", async (req, res) => {
   const username = req.body.username;
+  logger.debug(`[${username}]으로 로그인 시도`);
   let user = await User.findOne({ username });
   if (!user) {
     const colorcode = generateColor();

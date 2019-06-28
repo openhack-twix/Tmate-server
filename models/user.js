@@ -20,8 +20,8 @@ const userSchema = new mongoose.Schema({
   colorcode: {
     type: String,
     required: [true, 'colorcode must be defined'],
-    minlength: 7,
-    maxlength: 7
+    // minlength: 7,
+    // maxlength: 7
   },
   nickname: {
     type:String,
