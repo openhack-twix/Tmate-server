@@ -22,7 +22,7 @@
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
     "date-utils": "^1.2.21",
-    "express": "4.17.1",
+    "express": "4.17.3",
     "helmet": "^3.18.0",
     "joi": "^14.3.1",
     "joi-objectid": "^2.0.0",
